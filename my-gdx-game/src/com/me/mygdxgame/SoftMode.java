@@ -15,30 +15,21 @@ public class SoftMode implements IGraphicMode {
 	
 	@Override
 	public void refreshGraphics(ShapeRenderer shapeRenderer, short[] spectrumData) {
-		Vector2 currentPos = new Vector2(xPArr[0]);
 		Vector2 lastPos = new Vector2();
 		shapeRenderer.begin(ShapeType.Line);
-		for (int i = 0; i < xPArr.length; i++) 
+		int i=0;
+		for(Vector2 pos:xPArr)
 		{
-	    	shapeRenderer.setColor((float)i/storageSize, 0, 1, 1);
-	    	Vector2 pos = new Vector2(xPArr[i].x, xPArr[i].y);
-	    	
-	    	if(i < spectrumData.length)
-	    	{
-	    		Vector2 normal = Utils.normalVector(lastPos, pos);
-	    		float scale = Utils.scaleFromSpectrum(spectrumData[i]);
-	    		normal.scl(scale);
-	    		pos.add(normal);
-	    	}
-	    	Vector2 temp = new Vector2();
-	    	temp.x = pos.x - currentPos.x;
-	    	temp.y = pos.y - currentPos.y;
-	    	temp.nor();
-	    	temp.scl(0.01f);
-	    	currentPos.add(temp);
+			shapeRenderer.setColor((float)i/(float)storageSize, 0, 1, 1);
+			Vector2 modPos = new Vector2(pos);
+			if(i < spectrumData.length)
+				modPos.scl((float)spectrumData[i]/50000.0f);
+			modPos.add(pos);
 	    	if(i>2)
-	    		shapeRenderer.line(lastPos,currentPos);
-	    	lastPos = new Vector2(currentPos);
+	    		shapeRenderer.line(lastPos.x, lastPos.y, modPos.x, modPos.y);
+    		lastPos = modPos;
+    		i++;
+    		//Gdx.app.log("line:", "v0:"+String.valueOf(lastPos)+", v1:"+String.valueOf(pos));
 		}
 		shapeRenderer.end();
 	}
