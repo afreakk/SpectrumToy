@@ -14,6 +14,12 @@ public class Utils {
 		vec.nor();
 		return vec;
 	}
+	public static float scaleFromSpectrum(float spectrum)
+	{
+		float scale = spectrum;
+    	scale *= 0.000002;
+    	return scale;
+	}
 	public static Vector2 resolutionToGL(IntVec2 pos)
 	{
 		Vector2 vec = new Vector2((pos.x/(float)Gdx.graphics.getWidth())-0.5f, (pos.y/(float)Gdx.graphics.getHeight())-0.5f);

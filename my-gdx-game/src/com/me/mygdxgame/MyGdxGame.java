@@ -25,20 +25,22 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 	private short[] spectrumData = new short[storageSize];
 	private boolean isMono = true;
 	private ShapeRenderer shapeRenderer= null;
-	ArrayList<IntVec2> xPoints = new ArrayList<IntVec2>();
-	Vector2[] xPArr = null;
+	private ArrayList<IntVec2> xPoints = new ArrayList<IntVec2>();
+	private Vector2[] xPArr = null;
+	private IGraphicMode currentMode;
 	
 	@Override
 	public void create() 
 	{
-		Gdx.gl.glLineWidth(5);
+		Gdx.gl.glLineWidth(1);
 		shapeRenderer = new ShapeRenderer();
 		recorder  = Gdx.audio.newAudioRecorder(samples, isMono);
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera(1, h/w);
 		batch = new SpriteBatch();
-		Gdx.input.setInputProcessor(this);	
+		Gdx.input.setInputProcessor(this);
+		currentMode = new ZMode(storageSize,null);
 	}
 
 	@Override
@@ -58,37 +60,8 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
         	placingPos = 0;    
 	}
 	
-	private void refreshSpectrum()
-	{
-		Vector2 lastPos = new Vector2();
-		shapeRenderer.begin(ShapeType.Line);
-    	shapeRenderer.setColor(1, 0, 0, 1);
-		for (int i = 0; i < xPArr.length; i++) 
-		{
-	    	shapeRenderer.setColor((float)i/(float)xPArr.length, 0, 1, 1);
-	    	Vector2 pos = new Vector2(xPArr[i].x, xPArr[i].y);
-	    	
-	    	if(i < spectrumData.length)
-	    	{
-	    		Vector2 normal = Utils.normalVector(lastPos, pos);
-	    		float scale = scaleFromSpectrum(spectrumData[i]);
-	    		normal.scl(scale);
-	    		pos.add(normal);
-	    	}
-	    	
-	    	if(i>2)
-	    		shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);
-	    	lastPos = pos;
-		}
-		shapeRenderer.end();
-	}
 	
-	private float scaleFromSpectrum(float spectrum)
-	{
-		float scale = spectrum;
-    	scale *= 0.000002;
-    	return scale;
-	}
+
 	private float scaleFromHalfSpectrum(int start, int end)
 	{
 		int result = 0; 
@@ -96,17 +69,25 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 		{
 			result += spectrumData[i];
 		}
-		return scaleFromSpectrum(result)/(float)(end-start);
+		return Utils.scaleFromSpectrum(result)/(float)(end-start);
+	}
+	private float getBgColor()
+	{
+		float val = scaleFromHalfSpectrum(0,spectrumData.length)*10.0f;
+		val *= -1.0f;
+		val = Math.min(0.25f,val);
+		val = Math.max(val, 0.0f);
+		return val;//Math.min(val,0.01f);
 	}
 	@Override
 	public void render() 
 	{
 		record();	
-		Gdx.gl.glClearColor(0, scaleFromHalfSpectrum(0,spectrumData.length), 0, 1);
+		Gdx.gl.glClearColor(0, getBgColor(), 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		 shapeRenderer.setProjectionMatrix(camera.combined);
 		 if(xPArr != null)
-			 refreshSpectrum();
+			 currentMode.refreshGraphics(shapeRenderer, spectrumData);
 		 else
 			 drawLine();
 	}
@@ -114,11 +95,10 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 	{
 		Vector2 lastPos = new Vector2();
 		shapeRenderer.begin(ShapeType.Line);
-		shapeRenderer.setColor(1, 0, 0, 1);
 		int i=0;
 		for(IntVec2 vec:xPoints)
 		{
-			shapeRenderer.setColor((float)i/(float)xPoints.size(), 0, 1, 1);
+			shapeRenderer.setColor((float)i/(float)storageSize, 0, 1, 1);
 	    	Vector2 pos = Utils.resolutionToGL(vec);
 	    	if(i>2)
 	    		shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);	
@@ -140,6 +120,11 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 	}
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if(tap)
+		{
+			tap = false;
+			xPArr = null;
+		}
 		xPoints.add(new IntVec2(screenX,screenY));
 		return false;
 	}
@@ -160,18 +145,55 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	private boolean tap = false;
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		xPArr = null;
+		tap =  true;
 		return false;
 	}
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		xPArr = Utils.intToFloatVec(xPoints);
-		xPoints.clear();
+		if(!tap)
+		{
+			xPArr = Utils.intToFloatVec(xPoints);
+			currentMode.setArray(xPArr);
+			xPoints.clear();
+		}
+		else
+		{
+			switchMode();
+			setMode();
+		}
 		return false;
 	}
-	
+	private enum GMode
+	{
+		ZMode, 
+		SoftMode {
+	        @Override
+	        public GMode next() {
+	            return ZMode; 
+	        };
+	    };
+
+	    public GMode next() {
+	        return values()[ordinal() + 1];
+	    }
+	}
+	private void switchMode()
+	{
+		mode = mode.next();
+	}
+	GMode mode = GMode.ZMode;
+	private void setMode()
+	{
+		Gdx.app.log("mode", String.valueOf(mode));
+		switch(mode)
+		{
+		case ZMode: currentMode = new ZMode(storageSize, xPArr); break;
+		case SoftMode: currentMode = new SoftMode(storageSize, xPArr); break;
+		}
+	}
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
 		// TODO Auto-generated method stub
