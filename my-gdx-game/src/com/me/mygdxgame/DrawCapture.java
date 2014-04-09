@@ -2,7 +2,6 @@ package com.me.mygdxgame;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -24,7 +23,6 @@ public class DrawCapture {
 	    		shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);	
     		lastPos = pos;
     		i++;
-    		//Gdx.app.log("line:", "v0:"+String.valueOf(lastPos)+", v1:"+String.valueOf(pos));
 		}
 		shapeRenderer.end();
 	}

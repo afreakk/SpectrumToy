@@ -15,6 +15,7 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 	private DrawCapture drawCapture;
 	private Recorder recordMgr;
 	private ModeManager modeMgr;
+	private GUI gui;
 	@Override
 	public void create() 
 	{
@@ -27,11 +28,12 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 		float h = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera(1, h/w);
 		modeMgr = new ModeManager(recordMgr.getStorageSize());
+		gui = new GUI(modeMgr.getMode());
 	}
 
 	@Override
 	public void dispose() {
-		modeMgr.dispose();
+		gui.dispose();
 		recordMgr.disposeRecorder();
 	}
 	@Override
@@ -41,7 +43,7 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		drawLine();
-		modeMgr.drawModeText();
+		gui.draw();
 	}
 	private void drawLine()
 	{
