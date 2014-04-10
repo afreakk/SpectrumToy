@@ -10,17 +10,21 @@ public class GUI {
 		buttons.setButtonName(ButtonID.topLeft, "Begin Draw");
 		buttons.setButtonName(ButtonID.topRight, "End Draw");
 		buttons.setButtonName(ButtonID.bottomRight, "Switch Mode");
-		buttons.setButtonName(ButtonID.bottomLeft, modeToString(initMode));
+		buttons.setButtonName(ButtonID.bottomLeft, "Edit Drawing");
+		buttons.setButtonName(ButtonID.bottomMid, modeToString(initMode));
 	}	
-
 	public void dispose()
 	{
 		buttons.dispose();
 	}
 	public void updateMode(GMode mode)
 	{
-		buttons.setButtonName(ButtonID.bottomLeft, modeToString(mode));
+		buttons.setButtonName(ButtonID.bottomMid, modeToString(mode));
 	}	
+	public ButtonID hitTest(IntVec2 intersect)
+	{
+		return buttons.hitTest(intersect);
+	}
 	private String modeToString(GMode mode)
 	{
 		switch(mode)
@@ -34,5 +38,4 @@ public class GUI {
 	{
 		buttons.draw();
 	}
-
 }

@@ -19,45 +19,33 @@ public class DrawCapture {
 		{
 			shapeRenderer.setColor((float)i/(float)storageSize, 0, 1, 1);
 	    	Vector2 pos = Utils.resolutionToGL(vec);
-	    	if(i>2)
+	    	if(i>2 && pos != null && lastPos != null)
 	    		shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);	
     		lastPos = pos;
     		i++;
 		}
 		shapeRenderer.end();
 	}
-	private int pPoints = 0;
-	private boolean tap = false;
-	public void touchDragged(int x, int y)
+	public void insertPoints(int x, int y)
 	{
-		if(tap)
-		{	
-			if(pPoints  > 10)
-			{
-				tap = false;
-				xPArr = null;
-				pPoints = 0;
-			}
-			pPoints ++;
-		}
 		xPoints.add(new IntVec2(x,y));
 	}
-	public void touchDown()
+	public void finishLine()
 	{
-		tap =  true;
-	}
-	public boolean switchMode()
-	{
-		return tap;
+		if(xPoints.get(xPoints.size()-1) != null)
+            xPoints.add(null);
 	}
 	public Vector2[] getFreshLinePoints()
 	{
 		xPArr = Utils.intToFloatVec(xPoints);
-		xPoints.clear();
 		return xPArr;
 	}
 	public Vector2[] getOldLinePoints()
 	{
 		return xPArr;
+	}
+	public void clearPoints()
+	{
+		xPoints.clear();
 	}
 }

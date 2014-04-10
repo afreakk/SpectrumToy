@@ -10,11 +10,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.me.mygdxgame.Button.ButtonID;
 
 public class CornerButtons {
+	int height = 20;
+	int width = 85;
 	//formatting
-    int leftCoord = (int)((float)Gdx.graphics.getWidth()/16.0f);
-    int topCoord = Gdx.graphics.getHeight()-(int)((float)Gdx.graphics.getHeight()/16.0f);
-    int rightCoord = Gdx.graphics.getWidth()-(int)((float)Gdx.graphics.getWidth()/5.0f);
-    int bottomCoord =(int)((float)Gdx.graphics.getHeight()/16.0f);
+    int leftCoord = 0;
+    int topCoord = Gdx.graphics.getHeight();
+    int bottomCoord = height;
+    int rightCoord = Gdx.graphics.getWidth()-width;
+    int midCoord = (int)((float)Gdx.graphics.getWidth()/2.0f);
     //---==
     
 	private BitmapFont modeText;
@@ -30,7 +33,7 @@ public class CornerButtons {
 	}
 	private void createButton(ButtonID id)
 	{
-        buttons.put(id, new Button(posFromId(id)));
+        buttons.put(id, new Button(posFromId(id), width, height));
 	}
 	private void initAll()
 	{
@@ -38,6 +41,18 @@ public class CornerButtons {
         createButton(ButtonID.topRight);
         createButton(ButtonID.bottomRight);
         createButton(ButtonID.bottomLeft);
+        createButton(ButtonID.bottomMid);
+	}
+	public ButtonID hitTest(IntVec2 intersect)
+	{
+		Iterator it = buttons.entrySet().iterator();
+		while(it.hasNext())
+		{
+			Map.Entry elem = (Map.Entry)it.next();
+			if(((Button)elem.getValue()).hitTest(intersect))
+				return (ButtonID) elem.getKey();
+		}
+		return ButtonID.None;
 	}
 	private IntVec2 posFromId(ButtonID id)
 	{
@@ -47,9 +62,9 @@ public class CornerButtons {
 		case topRight: return new IntVec2(rightCoord, topCoord);
 		case bottomRight: return new IntVec2(rightCoord, bottomCoord);
 		case bottomLeft: return new IntVec2(leftCoord, bottomCoord);
+		case bottomMid: return new IntVec2(midCoord, bottomCoord);
+		default:Gdx.app.error("error:", "CornerButtons.posFromId(ButtonID id)"); return new IntVec2();
 		}
-		Gdx.app.error("error:", "CornerButtons.posFromId(ButtonID id)");
-		return new IntVec2();
 	}
 	public void setButtonName(ButtonID id, String name)
 	{

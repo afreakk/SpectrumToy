@@ -20,12 +20,20 @@ public class SoftMode implements IGraphicMode {
 		int i=0;
 		for(Vector2 pos:xPArr)
 		{
+			if(pos == null)
+			{
+				if(i+2 > xPArr.length)
+					break;
+				i++;
+				lastPos = xPArr[i];
+				continue;
+			}
 			shapeRenderer.setColor((float)i/(float)storageSize, 0, 1, 1);
 			Vector2 modPos = new Vector2(pos);
 			if(i < spectrumData.length)
 				modPos.scl((float)spectrumData[i]/50000.0f);
 			modPos.add(pos);
-	    	if(i>2)
+	    	if(i>2 && pos != null && lastPos != null)
 	    		shapeRenderer.line(lastPos.x, lastPos.y, modPos.x, modPos.y);
     		lastPos = modPos;
     		i++;

@@ -3,12 +3,11 @@ package com.me.mygdxgame;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
  
 
-public class MyGdxGame implements ApplicationListener, InputProcessor {
+public class MyGdxGame implements ApplicationListener {
 	private OrthographicCamera camera;
 
 	private ShapeRenderer shapeRenderer= null;
@@ -16,10 +15,11 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 	private Recorder recordMgr;
 	private ModeManager modeMgr;
 	private GUI gui;
+	private TouchListener touchListener = new TouchListener();
 	@Override
 	public void create() 
 	{
-		Gdx.input.setInputProcessor(this);
+		Gdx.input.setInputProcessor(touchListener);
 		Gdx.gl.glLineWidth(1);
 		drawCapture = new DrawCapture();
 		recordMgr = new Recorder();
@@ -29,6 +29,8 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 		camera = new OrthographicCamera(1, h/w);
 		modeMgr = new ModeManager(recordMgr.getStorageSize());
 		gui = new GUI(modeMgr.getMode());
+		//-- last -.- touchListener.registerAll
+		touchListener.registerAll(drawCapture, gui, modeMgr);
 	}
 
 	@Override
@@ -47,53 +49,14 @@ public class MyGdxGame implements ApplicationListener, InputProcessor {
 	}
 	private void drawLine()
 	{
-		if(drawCapture.getOldLinePoints() != null)
-			 modeMgr.refreshGraphics(shapeRenderer, recordMgr.getSpectrumData());
-		 else
-			 drawCapture.drawLine(shapeRenderer, recordMgr.getStorageSize());
+		switch(touchListener.getCurrentMode())
+		{
+		case drawing: drawCapture.drawLine(shapeRenderer, recordMgr.getStorageSize()); break;
+		case listening: modeMgr.refreshGraphics(shapeRenderer, recordMgr.getSpectrumData()); break;
+		}
+			 
 	}
 
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		drawCapture.touchDragged(screenX, screenY);
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		drawCapture.touchDown();
-		return false;
-	}
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if(drawCapture.switchMode())
-			modeMgr.newMode(drawCapture.getOldLinePoints());
-		else
-			modeMgr.setArray(drawCapture.getFreshLinePoints());
-		return false;
-	}
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(int amount) {
-		return false;
-	}
-	@Override
-	public boolean keyDown(int keycode) {
-		return false;
-	}
-	@Override
-	public boolean keyUp(int keycode) {
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
-		return false;
-	}
 	@Override
 	public void resize(int width, int height) {
 	}

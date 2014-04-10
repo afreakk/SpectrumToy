@@ -19,20 +19,26 @@ public class ZMode implements IGraphicMode{
 		shapeRenderer.begin(ShapeType.Line);
 		for (int i = 0; i < xPArr.length; i++) 
 		{
-	    	shapeRenderer.setColor((float)i/storageSize, 0, 1, 1);
-	    	Vector2 pos = new Vector2(xPArr[i].x, xPArr[i].y);
-	    	
-	    	if(i < spectrumData.length)
-	    	{
-	    		Vector2 normal = Utils.normalVector(lastPos, pos);
-	    		float scale = Utils.scaleFromSpectrum(spectrumData[i]);
-	    		normal.scl(scale);
-	    		pos.add(normal);
-	    	}
-	    	
-	    	if(i>2)
-	    		shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);
-	    	lastPos = pos;
+			if(xPArr[i] == null)
+			{
+				if(i+2 > xPArr.length)
+					break;
+				i++;
+				lastPos = xPArr[i];
+				continue;
+			}
+            shapeRenderer.setColor((float)i/storageSize, 0, 1, 1);
+            Vector2 pos = new Vector2(xPArr[i]);
+            if(i < spectrumData.length)
+            {
+                Vector2 normal = Utils.normalVector(lastPos, pos);
+                float scale = Utils.scaleFromSpectrum(spectrumData[i]);
+                normal.scl(scale);
+                pos.add(normal);
+            }
+            
+            if(i>2)
+                shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);
 		}
 		shapeRenderer.end();
 	}
