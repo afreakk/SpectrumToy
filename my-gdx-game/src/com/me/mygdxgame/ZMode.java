@@ -39,6 +39,7 @@ public class ZMode implements IGraphicMode{
             
             if(i>2)
                 shapeRenderer.line(lastPos.x, lastPos.y, pos.x, pos.y);
+            lastPos = pos;
 		}
 		shapeRenderer.end();
 	}

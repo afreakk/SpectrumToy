@@ -32,8 +32,11 @@ public class DrawCapture {
 	}
 	public void finishLine()
 	{
-		if(xPoints.get(xPoints.size()-1) != null)
-            xPoints.add(null);
+		if(xPoints.size()>0)
+		{
+            if(xPoints.get(xPoints.size()-1) != null)
+                xPoints.add(null);
+		}
 	}
 	public Vector2[] getFreshLinePoints()
 	{

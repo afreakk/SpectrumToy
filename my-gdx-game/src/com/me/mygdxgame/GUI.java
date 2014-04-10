@@ -7,10 +7,10 @@ public class GUI {
 	private CornerButtons buttons = new CornerButtons(); 
 	public GUI(GMode initMode)
 	{
-		buttons.setButtonName(ButtonID.topLeft, "Begin Draw");
-		buttons.setButtonName(ButtonID.topRight, "End Draw");
+		buttons.setButtonName(ButtonID.topLeft, "Draw(Clear)");
+		buttons.setButtonName(ButtonID.topRight, "Listen");
 		buttons.setButtonName(ButtonID.bottomRight, "Switch Mode");
-		buttons.setButtonName(ButtonID.bottomLeft, "Edit Drawing");
+		buttons.setButtonName(ButtonID.bottomLeft, "Draw(Edit)");
 		buttons.setButtonName(ButtonID.bottomMid, modeToString(initMode));
 	}	
 	public void dispose()

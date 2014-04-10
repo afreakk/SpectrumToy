@@ -1,8 +1,5 @@
 package com.me.mygdxgame;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
@@ -17,41 +14,38 @@ public class Button {
 		bottomMid,
 		None
 	}
-	private String caption = "";
-	private IntVec2 pos;
-	private IntVec2 dimensions;
 	private ButtonGraphics buttonGraphic;
-	public Button(IntVec2 pos, int width, int height)
+	private TextDisplay caption;
+	private IntRect rect;
+	public Button(IntVec2 pos, int width, int height, BitmapFont modeText)
 	{
-		this.pos = pos;
-		this.dimensions = new IntVec2(width,height);
-		buttonGraphic = new ButtonGraphics(this.pos, this.dimensions);
+		this.rect = new IntRect(pos, new IntVec2(width,height));
+		buttonGraphic = new ButtonGraphics(this.rect);
+		caption = new TextDisplay(this.rect, modeText);
 	}
-	public void SetButtonName(String caption)
+	public void draw(SpriteBatch batch)
 	{
-		this.caption = caption;
-	}
-	public void draw(SpriteBatch batch, BitmapFont modeText)
-	{
+		WhiteBlink.update();
 		buttonGraphic.draw(batch);
-		modeText.draw(batch, caption, pos.x, pos.y);
+		caption.centerTextDraw(batch);
+	}
+	public void setCaption(String caption)
+	{
+		this.caption.setCaption(caption);
 	}
 	public boolean hitTest(IntVec2 intersect)
 	{
-		if(intersect.x > pos.x)
+		if(rect.hitTest(intersect))
 		{
-			if(intersect.x < pos.x + dimensions.x)
-			{
-				if(intersect.y < pos.y)
-				{
-					if(intersect.y > pos.y - dimensions.y)
-					{
-						return true;
-					}
-				}
-			}
+			onButtonPress();
+            return true;
 		}
 		return false;
+	}
+	private void onButtonPress()
+	{
+        Gdx.input.vibrate(50);
+        WhiteBlink.goWhite();
 	}
 	
 }

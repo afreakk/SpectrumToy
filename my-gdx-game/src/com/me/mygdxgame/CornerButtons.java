@@ -10,14 +10,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.me.mygdxgame.Button.ButtonID;
 
 public class CornerButtons {
-	int height = 20;
-	int width = 85;
+	int height =(int)( (float)Gdx.graphics.getHeight()/16.0f);
+	int width = (int)( (float)Gdx.graphics.getWidth()/9.0f);
 	//formatting
     int leftCoord = 0;
     int topCoord = Gdx.graphics.getHeight();
     int bottomCoord = height;
     int rightCoord = Gdx.graphics.getWidth()-width;
-    int midCoord = (int)((float)Gdx.graphics.getWidth()/2.0f);
+    int midCoord = (int)(((float)Gdx.graphics.getWidth()/2.0f)-(float)width/2.0f);
     //---==
     
 	private BitmapFont modeText;
@@ -27,13 +27,14 @@ public class CornerButtons {
 	public CornerButtons()
 	{
 		modeText = new BitmapFont();
+		modeText.setScale(Gdx.graphics.getWidth()/700.0f);
 	    modeText.setColor(1, 1, 1, 1);
 		batch = new SpriteBatch();
 		initAll();
 	}
 	private void createButton(ButtonID id)
 	{
-        buttons.put(id, new Button(posFromId(id), width, height));
+        buttons.put(id, new Button(posFromId(id), width, height,modeText));
 	}
 	private void initAll()
 	{
@@ -68,7 +69,7 @@ public class CornerButtons {
 	}
 	public void setButtonName(ButtonID id, String name)
 	{
-		buttons.get(id).SetButtonName(name);
+		buttons.get(id).setCaption(name);
 	}
 	public void dispose()
 	{
@@ -82,7 +83,7 @@ public class CornerButtons {
 		while(it.hasNext())
 		{
 			Map.Entry elem = (Map.Entry)it.next();
-			((Button)elem.getValue()).draw(batch, modeText);
+			((Button)elem.getValue()).draw(batch);
 		}
 		batch.end();
 	}

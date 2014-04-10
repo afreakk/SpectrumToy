@@ -9,20 +9,24 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class ButtonGraphics {
 	private Texture btnTexture;
 	private Sprite btnSprite;
-	private IntVec2 pos;
-	private IntVec2 dimensions;
-	public ButtonGraphics(IntVec2 pos, IntVec2 dimensions)
+	private IntRect rect;
+	public ButtonGraphics(IntRect rect)
 	{
-		this.dimensions = dimensions;
-		this.pos = pos;
+		this.rect = rect;
 		Pixmap pixmap = new Pixmap( 64, 64, Format.RGBA8888 );
-		pixmap.setColor( 0, 1, 0, 0.75f );
+		pixmap.setColor( 1, 1, 1, 0.15f );
 		pixmap.fill();
-		btnTexture = new Texture( pixmap );
+		setupSprite(pixmap, this.rect);
 		pixmap.dispose();
+	}
+	private void setupSprite(Pixmap pixmap, IntRect rect)
+	{
+		IntVec2 pos = rect.position();
+		IntVec2 dim = rect.dimensions();
+		btnTexture = new Texture( pixmap );
 		btnSprite = new Sprite(btnTexture);
-		btnSprite.setSize(dimensions.x, dimensions.y);
-		btnSprite.setPosition(pos.x, pos.y-dimensions.y);
+		btnSprite.setSize(dim.x, dim.y);
+		btnSprite.setPosition(pos.x, pos.y-dim.y);
 	}
 	public void draw(SpriteBatch batch)
 	{
